@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class TaxCalculator extends JFrame {
     private JTextField incomeField;
@@ -65,68 +67,62 @@ public class TaxCalculator extends JFrame {
         });
     }
 
-    private void calculateTax() {
-        try {
-            double income = Double.parseDouble(incomeField.getText());
-            double tax = 0;
-            
-            if (oldRegimeRadio.isSelected()) {
-                tax = calculateOldRegimeTax(income);
-            } else {
-                tax = calculateNewRegimeTax(income);
-            }
-
-            resultArea.setText(String.format("Taxable Income: ₹%.2f\n", income) +
-                    String.format("Tax Regime: %s\n", 
-                            (oldRegimeRadio.isSelected() ? "Old" : "New")) +
-                    String.format("Tax Payable: ₹%.2f", tax));
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter valid income amount!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private double calculateOldRegimeTax(double income) {
-        // Sample tax slabs for old regime
+   private void calculateTax() {
+    try {
+        double income = Double.parseDouble(incomeField.getText());
         double tax = 0;
-        if (income > 1000000) {
-            tax += (income - 1000000) * 0.3;
-            income = 1000000;
-        }
-        if (income > 500000) {
-            tax += (income - 500000) * 0.2;
-            income = 500000;
-        }
-        if (income > 250000) {
-            tax += (income - 250000) * 0.05;
-        }
-        return tax;
-    }
 
-    private double calculateNewRegimeTax(double income) {
-        // Sample tax slabs for new regime
-        double tax = 0;
-        if (income > 1500000) {
-            tax += (income - 1500000) * 0.3;
-            income = 1500000;
-        }
-        if (income > 1200000) {
-            tax += (income - 1200000) * 0.2;
-            income = 1200000;
-        }
-        if (income > 900000) {
-            tax += (income - 900000) * 0.15;
-            income = 900000;
-        }
-        if (income > 600000) {
-            tax += (income - 600000) * 0.1;
-            income = 600000;
-        }
-        if (income > 300000) {
-            tax += (income - 300000) * 0.05;
-        }
-        return tax;
+        // South Africa uses a single progressive tax system (no old/new regimes)
+        tax = calculateSouthAfricanTax(income);
+
+        // Format currency for South Africa (ZAR)
+        NumberFormat zarFormat = NumberFormat.getCurrencyInstance(new Locale("en", "ZA"));
+        
+        resultArea.setText(
+            "Taxable Income: " + zarFormat.format(income) + "\n" +
+            "Tax Payable: " + zarFormat.format(tax)
+        );
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Please enter valid ZAR amount!", 
+                "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
+// Updated with South Africa's 2023/2024 tax brackets
+private double calculateSouthAfricanTax(double income) {
+    double tax = 0;
+    
+    // Tax brackets (2023/2024 tax year)
+    if (income > 1_817_000) {
+        tax += (income - 1_817_000) * 0.45;
+        income = 1_817_000;
+    }
+    if (income > 857_900) {
+        tax += (income - 857_900) * 0.41;
+        income = 857_900;
+    }
+    if (income > 673_000) {
+        tax += (income - 673_000) * 0.39;
+        income = 673_000;
+    }
+    if (income > 512_800) {
+        tax += (income - 512_800) * 0.36;
+        income = 512_800;
+    }
+    if (income > 370_500) {
+        tax += (income - 370_500) * 0.31;
+        income = 370_500;
+    }
+    if (income > 237_100) {
+        tax += (income - 237_100) * 0.26;
+        income = 237_100;
+    }
+    tax += income * 0.18;  // Lowest bracket
+    
+    // Subtract primary rebate (R17,235 for 2023/2024)
+    tax = Math.max(tax - 17_235, 0);
+    
+    return tax;
+}
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
