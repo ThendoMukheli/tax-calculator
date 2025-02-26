@@ -7,7 +7,6 @@ import java.util.Locale;
 
 public class TaxCalculator extends JFrame {
     private JTextField incomeField;
-    private JRadioButton oldRegimeRadio, newRegimeRadio;
     private JTextArea resultArea;
 
     public TaxCalculator() {
@@ -24,14 +23,7 @@ public class TaxCalculator extends JFrame {
         
         // Radio Buttons Panel
         JPanel radioPanel = new JPanel(new GridLayout(1, 2));
-        oldRegimeRadio = new JRadioButton("Old Regime", true);
-        newRegimeRadio = new JRadioButton("New Regime");
-        ButtonGroup regimeGroup = new ButtonGroup();
-        regimeGroup.add(oldRegimeRadio);
-        regimeGroup.add(newRegimeRadio);
-        radioPanel.add(oldRegimeRadio);
-        radioPanel.add(newRegimeRadio);
-
+        
         // Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton calculateButton = new JButton("Calculate Tax");
@@ -62,7 +54,6 @@ public class TaxCalculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 incomeField.setText("");
                 resultArea.setText("");
-                oldRegimeRadio.setSelected(true);
             }
         });
     }
